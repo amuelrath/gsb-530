@@ -1,0 +1,353 @@
+---
+title: "Week 3 Assignment & Notes"
+format: html
+execute:
+    echo: true
+---
+
+# Week 3 Assignment
+
+## Question 1
+
+```{r}
+library(readxl)
+
+myData <- read_excel("data/Ch11_Q4_Data_File.xlsx")
+View(myData)
+```
+
+Using the original values, compute the **Euclidean** distance for all possible pairs of the first three observations.
+
+```{r}
+euclids <- dist(myData, method = "euclidean")
+```
+
+```{r}
+euclid_matrix <- as.matrix(euclids)
+
+euclid_matrix[1, 2]
+euclid_matrix[1, 3]
+euclid_matrix[2, 3]
+```
+
+Based on the entire data set, find the minimum and maximum values for the three variables. Use the min-max transformation to normalize the values, and then compute the **Euclidean** distance for all possible pairs of the first three observations.
+
+```{r}
+min_values <- apply(myData, 2, min)
+max_values <- apply(myData, 2, max)
+
+print("Minimum values:")
+print(min_values)
+print("Maximum values:")
+print(max_values)
+```
+
+```{r}
+normalize <- function(x) {
+    return((x - min(x)) / (max(x) - min(x)))
+}
+```
+
+```{r}
+myData_normalized <- as.data.frame(apply(myData, 2, normalize))
+```
+
+```{r}
+euclids_norm <- dist(myData_normalized[1:3,], method = "euclidean")
+euclid_matrix_norm <- as.matrix(euclids_norm)
+
+euclid_matrix_norm[1,2]
+euclid_matrix_norm[1,3]
+euclid_matrix_norm[2,3]
+```
+
+Using the original values, compute the **Manhattan** distance for all possible pairs of the first three observations.
+
+```{r}
+manhattans <- dist(myData, method = "manhattan")
+```
+
+```{r}
+manhattan_matrix <- as.matrix(manhattans)
+
+manhattan_matrix[1, 2]
+manhattan_matrix[1, 3]
+manhattan_matrix[2, 3]
+```
+
+Using the min-max normalized values, compute the **Manhattan** distance for all possible pairs of the first three observations.
+
+```{r}
+manhattans_norm <- dist(myData_normalized[1:3,], method = "manhattan")
+manhattan_matrix_norm <- as.matrix(manhattans_norm)
+
+manhattan_matrix_norm[1,2]
+manhattan_matrix_norm[1,3]
+manhattan_matrix_norm[2,3]
+```
+
+## Question 2
+
+```{r}
+myData <- read_excel("data/Ch11_Q10_Data_File.xlsx")
+View(myData)
+```
+
+Without transforming the values, compute the **Euclidean** distance for all possible pairs of the first three employees.
+
+```{r}
+euclids <- dist(myData, method = "euclidean")
+```
+
+```{r}
+euclid_matrix <- as.matrix(euclids)
+
+euclid_matrix[1, 2]
+euclid_matrix[1, 3]
+euclid_matrix[2, 3]
+```
+
+Compute the z-score standardized salaries and GPAs for the first three employees.
+
+$$
+z = \frac{x-\mu}{\sigma}
+$$
+
+```{r}
+z <- function(val, mean, sd) {
+    return ((val - mean) / sd)
+}
+```
+
+```{r}
+mean_salary <- mean(myData$Salary)
+sd_salary <- sd(myData$Salary)
+
+myData$ZSalary <- z(myData$Salary, mean_salary, sd_salary)
+```
+
+```{r}
+mean_gpa <- mean(myData$GPA)
+sd_gpa <- sd(myData$GPA)
+
+myData$ZGPA <- z(myData$GPA, mean_gpa, sd_gpa)
+```
+
+Based on the z-score standardized salaries and GPAs, compute the **Euclidean** distance for all possible pairs of the first three employees.
+
+```{r}
+euclids <- dist(myData[, c("ZSalary", "ZGPA")], method = "euclidean")
+```
+
+```{r}
+euclid_matrix <- as.matrix(euclids)
+
+euclid_matrix[1, 2]
+euclid_matrix[1, 3]
+euclid_matrix[2, 3]
+```
+
+Based on the z-score standardized salaries and GPAs, compute the **Manhattan** distance for all possible pairs of the first three employees.
+
+```{r}
+manhattans <- dist(myData, method = "manhattan")
+```
+
+```{r}
+manhattan_matrix <- as.matrix(manhattans)
+
+manhattan_matrix[1, 2]
+manhattan_matrix[1, 3]
+manhattan_matrix[2, 3]
+```
+
+Based on the z-score standardized Manhattan distance values, identify the pair of the first three employees that are most similar.
+
+*1 and 3 are the most similar because they have the lowest manhattan distance.*
+
+## Question 3
+
+```{r}
+myData <- read_excel("data/Ch11_Q17_Data_File.xlsx")
+View(myData)
+```
+
+Using the first five sales transactions, compute the matching coefficients for all pairwise observations for the three binary variables.
+
+$$
+\text{Matching Coefficient} = \frac{\text{Number of Variables with Matching Outcomes}}{\text{Total Number of Variables}}
+$$
+
+```{r}
+matching_coef <- function(row1, row2) {
+    matches <- sum(row1 == row2)
+    total <- length(row1)
+    return(matches / total)
+}
+```
+
+```{r}
+transactions <- myData[1:5, c("Hamburgers", "Fries", "Soda")]
+```
+
+```{r}
+matching_coef(transactions[1,], transactions[2,])
+matching_coef(transactions[1,], transactions[3,])
+matching_coef(transactions[1,], transactions[4,])
+matching_coef(transactions[1,], transactions[5,])
+
+matching_coef(transactions[2,], transactions[3,])
+matching_coef(transactions[2,], transactions[4,])
+matching_coef(transactions[2,], transactions[5,])
+
+matching_coef(transactions[3,], transactions[4,])
+matching_coef(transactions[3,], transactions[5,])
+
+matching_coef(transactions[4,], transactions[5,])
+```
+
+Using the first five sales transactions, compute Jaccard’s coefficients for all pairwise observations for the three binary variables.
+
+```{r}
+jaccards <- dist(transactions, method = "binary")
+jaccards
+```
+
+Based on the matching coefficients, which of the following transactions is the most similar pair?
+
+*for jaccards, we want a smaller value. for matching coefficients, we want a larger value*
+
+*Observations 1 and 5 are most similar;* `matching_coef = 1`
+
+Based on the matching coefficients, which of the following transactions is the least similar pair?
+
+*Observations 2 and 4 are least similar;* `matching_coef = 0`
+
+## Question 4
+
+```{r}
+# function to do this all for me
+report <- function(df) {
+    TP <- sum(df$`Actual Class` == 1 & df$Predicted_Class == 1)
+    TN <- sum(df$`Actual Class` == 0 & df$Predicted_Class == 0)
+    FP <- sum(df$`Actual Class` == 0 & df$Predicted_Class == 1)
+    FN <- sum(df$`Actual Class` == 1 & df$Predicted_Class == 0)
+
+    misclassification_rate <- 1 - accuracy
+    print(paste("Misclassification Rate: ", misclassification_rate))
+
+    accuracy <- (TP + TN) / (TP + TN + FP + FN)
+    print(paste("Accuracy:", accuracy))
+
+    sensitivity <- (TP) / (TN + FN)
+    print(paste("Sensitivity: ", sensitivity))
+
+    precision <- (TP) / (TP + FP)
+    print(paste("Precision: ", precision))
+
+    specificity <- (TN) / (TN + FP)
+    print(paste("Specificity: ", specificity))
+
+    
+}
+```
+
+```{r}
+myData <- read_excel("data_week_3/Ch11_Q23_Data_File.xlsx")
+View(myData)
+```
+
+Compute the misclassification rate, accuracy rate, sensitivity, precision, and specificity using the cutoff value of 0.5.
+
+```{r}
+# create predicted class based on cutoff
+myData$Predicted_Class <- ifelse(myData$`Class 1 Probability` >= 0.5, 1, 0)
+```
+
+```{r}
+report(myData)
+```
+
+Compute the misclassification rate, accuracy rate, sensitivity, precision, and specificity using the cutoff value of 0.25.
+
+```{r}
+# create predicted class based on cutoff
+myData$Predicted_Class <- ifelse(myData$`Class 1 Probability` >= 0.25, 1, 0)
+```
+
+```{r}
+report(myData)
+```
+
+Compute the misclassification rate, accuracy rate, sensitivity, precision, and specificity using the cutoff value of 0.75.
+
+```{r}
+# create predicted class based on cutoff
+myData$Predicted_Class <- ifelse(myData$`Class 1 Probability` >= 0.75, 1, 0)
+```
+
+```{r}
+report(myData)
+```
+
+## Question 5
+
+```{r}
+myData <- read_excel("data_week_3/Ch11_Q34_Data_File.xlsx")
+View(myData)
+```
+
+Compute the ME, RMSE, MAD, MPE, and MAPE for the two predictive models.
+
+$$
+\text{Mean Error} = ME = \frac{1}{n} \sum^n_{i=1} (y_i - \hat{y}_i)
+$$ $$
+\text{Mean Absolute Deviation} = MAD = \frac{1}{n} \sum^n_{i=1} |y_i - \hat{y}_i|
+$$ $$
+\text{Root Mean Square Error} = RMSE = \sqrt{\frac{1}{n} \sum^n_{i=1}(y_i - \hat{y}_i)^2}
+$$ $$
+\text{Mean Percentage Error} = MPE = \frac{1}{n} \sum^n_{i=1} \frac{y_i-\hat{y}_i}{y_i} \times 100
+$$ $$
+\text{Mean Absolute Percentage Error} = MAPE = \frac{1}{n} \sum^n_{i=1} |\frac{y_i-\hat{y}_i}{y_i}| \times 100
+$$
+
+```{r}
+report <- function(actual, predicted) {
+    n <- length(actual)
+    
+    mean_error <- (sum(actual - predicted) / n)
+    print(paste("ME: ", mean_error))
+    
+    mean_absolute_deviation <- (sum(abs(actual - predicted)) / n)
+    print(paste("MAD: ", mean_absolute_deviation))
+    
+    root_mean_square_error <- sqrt(sum((actual - predicted)**2) / n)
+    print(paste("RMSE: ", root_mean_square_error))
+    
+    mean_percentage_error <- (sum(( (actual - predicted) / actual)*100 )) / n
+    print(paste("MPE: ", mean_percentage_error))
+    
+    mean_absolute_percentage_error <- (sum( abs( (actual - predicted) / actual) * 100)) / n
+    print(paste("MAPE: ", mean_absolute_percentage_error))
+}
+```
+
+```{r}
+print("Model 1 \n")
+report(myData$`Actual Price`, myData$`Predicted Price 1`)
+```
+
+```{r}
+print("Model 2 \n")
+report(myData$`Actual Price`, myData$`Predicted Price 2`)
+```
+
+Compare the predictive models to a base model where every house is predicted to be sold at the average price of all the houses in the training data set, which is \$260,500. Compute RMSE for the base model.
+
+```{r}
+myData$Average = 260500
+```
+
+```{r}
+report(myData$`Actual Price`, myData$Average)
+```
