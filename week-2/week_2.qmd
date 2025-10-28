@@ -1,0 +1,144 @@
+---
+title: "Week 2 Assignment & Notes"
+format: 
+    html:
+        embed-resources: true
+execute:
+    echo: true
+---
+
+```{r}
+library(readxl)
+```
+
+## Question 1
+
+```{r}
+myData <- read_excel("../data/Ch2_Q36_Data_File.xlsx")
+View(myData)
+```
+
+Bin the values of x1 into three equal-size groups. Label the groups with numbers 1 (lowest values) to 3 (highest values). How many observations are assigned to group 1?
+
+```{r}
+grouped <- cut(myData$x1,
+    breaks = quantile(myData$x1, probs = c(0, 1/3, 2/3, 1)),
+    labels = c(1, 2, 3),
+    include.lowest = TRUE
+)
+
+sum(grouped == 1) # 11 is correct!
+```
+
+Bin the values of x2 into three equal-interval groups. Label the groups with numbers 1 (lowest values) to 3 (highest values). How many observations are assigned to group 2?
+
+```{r}
+grouped <- cut(myData$x2,
+    breaks = 3,
+    labels = c(1, 2, 3),
+    include.lowest = TRUE
+)
+
+sum(grouped == 2) # 13 is correct!
+```
+
+### Bin the values of x3 into the following three groups: \<50,000, between 50,000 and 100,000, and \> 100,000. Label the groups with numbers 1(lowest values) to 3 (highest values). How many observations are assigned to group 1?
+
+```{r}
+grouped <- cut(myData$x3,
+               breaks = c(-Inf, 50000, 100000, Inf),
+               labels = c(1, 2, 3),
+               include.lowest = TRUE,
+               right = FALSE)
+
+sum(grouped == 1) # 8 is correct
+```
+
+## Question 2
+
+```{r}
+myData <- read_excel("../data/Ch2_Q53_Data_File.xlsx")
+View(myData)
+```
+
+### The variable x1 contains three categories: S, M, and L. Convert the category names into category scores (i.e. S = 1, M = 2, and L = 3). How many observations have a category score of 3?
+
+```{r}
+myData$x1_score <- as.numeric(factor(myData$x1, levels = c("S", "M", "L")))
+
+sum(myData$x1_score == 3) # 22 is correct
+```
+
+### The variable x2 contains two categories: Yes and No. Transform x2 into an appropriate number of dummy variables using "No" as the reference category. How many dummy variable (s) should be created?
+
+We expect only 1 dummy to be created, as one of them will be used as a reference to avoid multicollinearity.
+
+### The variable x3 contains four categories: A, B, C, and D. Reduce the number of categories by combining the two least-frequent categories into a new category E. How many observations are in the E category?
+
+```{r}
+# Step 1: Find the frequency of each category
+freq_table <- table(myData$x3)
+freq_table
+
+# Step 2: Identify the two least-frequent categories
+least_frequent <- names(sort(freq_table)[1:2])
+least_frequent
+
+# Step 3: Create new variable with combined category
+myData$x3_combined <- as.character(myData$x3)
+myData$x3_combined[myData$x3_combined %in% least_frequent] <- "E"
+
+# Step 4: Count observations in category E
+sum(myData$x3_combined == "E") # 15 is correct
+```
+
+## Question 3
+
+```{r}
+myData <- read_excel("../data/Ch4_Q7_Data_File.xlsx")
+View(myData)
+```
+
+#### Construct the frequency distribution that summarizes the results from the questionnaire.
+
+```{r}
+freq_table <- table(myData$Quality)
+freq_table
+```
+
+## Question 4
+
+```{r}
+myData <- read_excel("../data/Ch4_Q19_Data_File.xlsx")
+View(myData)
+```
+
+### Construct the frequency distribution for the median house values. Use six intervals with widths of 0 \< x ≤ 100,000, 100,000 \< x ≤ 200,000, etc.
+
+```{r}
+# Create bins with specified intervals
+myData$House_Value_bins <- cut(myData$House_Value,
+                               breaks = c(0, 100000, 200000, 300000, 400000, 500000, 600000),
+                               labels = c("0-100k", "100k-200k", "200k-300k", 
+                                           "300k-400k", "400k-500k", "500k-600k"),
+                               include.lowest = FALSE,
+                               right = TRUE)
+
+# Create frequency distribution
+freq_dist <- table(myData$House_Value_bins)
+freq_dist
+```
+
+### Construct the histogram. Is the distribution symmetric? If not, is it positively or negatively skewed?
+
+```{r}
+# Create histogram with specified breaks
+hist(myData$House_Value,
+     breaks = seq(0, 600000, by = 100000),
+     main = "Histogram of House Values",
+     xlab = "House Value",
+     ylab = "Frequency",
+     col = "lightblue",
+     border = "black",
+     las = 1)
+```

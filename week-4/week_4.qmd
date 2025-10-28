@@ -1,6 +1,8 @@
 ---
 title: "Week 4 Assignment & Notes"
-format: html
+format: 
+    html:
+        embed-resources: true
 execute:
     echo: true
 ---
@@ -16,7 +18,7 @@ library(readxl)
 A Realtor, is analyzing the relationship between the sale price of a home (Price in \$), its square footage (Sqft), the number of bedrooms (Beds), the number of bathrooms (Baths), and a Colonial dummy variable (Colonial equals 1 if a colonial-style home, 0 otherwise). The accompanying data file shows information on 36 recent home sales.
 
 ```{r}
-myData <- read_excel("data_week_4/Ch7_Q15_Data_File.xlsx")
+myData <- read_excel("../data/Ch7_Q15_Data_File.xlsx")
 View(myData)
 ```
 
@@ -43,7 +45,7 @@ predict(model, item, level = 0.95, interval = "prediction")
 A research analyst is trying to determine whether a firm’s price-earnings (P/E) and price-sales (P/S) ratios can explain the firm’s stock performance over the past year. A P/E ratio is calculated as a firm’s share price compared to the income or profit earned by the firm per share. Generally, a high P/E ratio suggests that investors are expecting higher earnings growth in the future compared to companies with a lower P/E ratio. The P/S ratio is calculated by dividing a firm’s share price by the firm’s revenue per share for the trailing 12 months. In short, investors can use the P/S ratio to determine how much they are paying for a dollar of the firm’s sales rather than a dollar of its earnings (P/E ratio). In general, the lower the P/S ratio, the more attractive the investment. The accompanying data file includes the year-to-date returns (Return in %) and the P/E and P/S ratios (labeled PE and PS, respectively) for 30 firms.
 
 ```{r}
-myData <- read_excel("data_week_4/Ch7_Q25_Data_File.xlsx")
+myData <- read_excel("../data/Ch7_Q25_Data_File.xlsx")
 View(myData)
 ```
 
@@ -90,9 +92,8 @@ exp(1.02 + 0.96*log(50) + 0.10**2/2)
 
 Several studies have reported lower participation in the science, technology, engineering, and mathematics (STEM) careers among female and minority ethnic group students. The accompanying data file includes information on whether the student has applied to a STEM field (1 if STEM, 0 otherwise), whether or not the student is female (1 if female, 0 otherwise), white (1 if white, 0 otherwise), and Asian (1 if Asian, 0 otherwise). Also included in the survey is the information on the student’s high school GPA and the SAT scores.
 
-
 ```{r}
-myData <- read_excel("data_week_4/Ch9_Q13_Data_File.xlsx")
+myData <- read_excel("../data/Ch9_Q13_Data_File.xlsx")
 View(myData)
 ```
 
@@ -149,7 +150,7 @@ predict(model, item, type = "response")
 A logistic regression model is estimated to analyze the probability of complications for male patients resulting from a serious infection. Predictor variables include the patient’s weight and age and whether he is diabetic (Diabetes equals 1 if diabetic, 0 otherwise). The accompanying data file includes information on 260 male patients who had tested positive for a serious infection.
 
 ```{r}
-myData <- read_excel("data_week_4/Ch9_Q21_Data_File.xlsx")
+myData <- read_excel("../data/Ch9_Q21_Data_File.xlsx")
 View(myData)
 ```
 

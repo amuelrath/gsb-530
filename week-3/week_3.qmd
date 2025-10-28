@@ -1,6 +1,8 @@
 ---
 title: "Week 3 Assignment & Notes"
-format: html
+format: 
+    html:
+        embed-resources: true
 execute:
     echo: true
 ---
@@ -12,7 +14,7 @@ execute:
 ```{r}
 library(readxl)
 
-myData <- read_excel("data/Ch11_Q4_Data_File.xlsx")
+myData <- read_excel("../data/Ch11_Q4_Data_File.xlsx")
 View(myData)
 ```
 
@@ -89,7 +91,7 @@ manhattan_matrix_norm[2,3]
 ## Question 2
 
 ```{r}
-myData <- read_excel("data/Ch11_Q10_Data_File.xlsx")
+myData <- read_excel("../data/Ch11_Q10_Data_File.xlsx")
 View(myData)
 ```
 
@@ -168,7 +170,7 @@ Based on the z-score standardized Manhattan distance values, identify the pair o
 ## Question 3
 
 ```{r}
-myData <- read_excel("data/Ch11_Q17_Data_File.xlsx")
+myData <- read_excel("../data/Ch11_Q17_Data_File.xlsx")
 View(myData)
 ```
 
@@ -233,11 +235,11 @@ report <- function(df) {
     FP <- sum(df$`Actual Class` == 0 & df$Predicted_Class == 1)
     FN <- sum(df$`Actual Class` == 1 & df$Predicted_Class == 0)
 
-    misclassification_rate <- 1 - accuracy
-    print(paste("Misclassification Rate: ", misclassification_rate))
-
     accuracy <- (TP + TN) / (TP + TN + FP + FN)
     print(paste("Accuracy:", accuracy))
+
+    misclassification_rate <- 1 - accuracy
+    print(paste("Misclassification Rate: ", misclassification_rate))
 
     sensitivity <- (TP) / (TN + FN)
     print(paste("Sensitivity: ", sensitivity))
@@ -253,7 +255,7 @@ report <- function(df) {
 ```
 
 ```{r}
-myData <- read_excel("data_week_3/Ch11_Q23_Data_File.xlsx")
+myData <- read_excel("../data/Ch11_Q23_Data_File.xlsx")
 View(myData)
 ```
 
@@ -293,7 +295,7 @@ report(myData)
 ## Question 5
 
 ```{r}
-myData <- read_excel("data_week_3/Ch11_Q34_Data_File.xlsx")
+myData <- read_excel("../data/Ch11_Q34_Data_File.xlsx")
 View(myData)
 ```
 
@@ -301,13 +303,15 @@ Compute the ME, RMSE, MAD, MPE, and MAPE for the two predictive models.
 
 $$
 \text{Mean Error} = ME = \frac{1}{n} \sum^n_{i=1} (y_i - \hat{y}_i)
-$$ $$
+$$
 \text{Mean Absolute Deviation} = MAD = \frac{1}{n} \sum^n_{i=1} |y_i - \hat{y}_i|
-$$ $$
+$$ 
 \text{Root Mean Square Error} = RMSE = \sqrt{\frac{1}{n} \sum^n_{i=1}(y_i - \hat{y}_i)^2}
-$$ $$
+$$
+$$ 
 \text{Mean Percentage Error} = MPE = \frac{1}{n} \sum^n_{i=1} \frac{y_i-\hat{y}_i}{y_i} \times 100
-$$ $$
+$$
+$$ 
 \text{Mean Absolute Percentage Error} = MAPE = \frac{1}{n} \sum^n_{i=1} |\frac{y_i-\hat{y}_i}{y_i}| \times 100
 $$
 
