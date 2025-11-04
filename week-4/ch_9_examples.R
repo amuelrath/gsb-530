@@ -1,0 +1,278 @@
+options(scipen=999)
+library(readxl)
+setwd("C://Users/Sanjiv Jaggia/Dropbox/Textbook Data Analytics/Bus Analytics, Evergreen 2025/Draft/Chapter 9")
+
+# Examples 9.1 and 9.2
+myData <- myData <- read_excel("jaggia_ba_2025_ch09_data.xlsx", sheet = "Pollution")
+Linear_Model <- lm(Illness~Minutes, data = myData)
+summary(Linear_Model)
+Logistic_Model <- glm(Illness~Minutes, family = binomial, data = myData)
+summary(Logistic_Model)
+predict(Linear_Model, data.frame(Minutes=480))
+predict(Logistic_Model, data.frame(Minutes=480), type = "response")
+
+# Example 9.3
+myData <- myData <- read_excel("jaggia_ba_2025_ch09_data.xlsx", sheet = "Spam")
+Linear_Model <- lm(Spam ~ Recipients + Hyperlinks + Characters, data = myData)
+summary(Linear_Model)
+Logistic_Model <- glm(Spam ~ Recipients + Hyperlinks + Characters, family = binomial, data = myData)
+summary(Logistic_Model)
+mRec <- seq(5,50,by = 5)
+#mRec <- 10:50
+mHyp <- mean(myData$Hyperlinks)
+mCha <- mean(myData$Characters)
+pLin <- predict(Linear_Model, data.frame(Recipients=mRec, Hyperlinks=mHyp, Characters=mCha))
+pLog <- predict(Logistic_Model, data.frame(Recipients=mRec, Hyperlinks=mHyp, Characters=mCha), type = "response")
+plot(mRec,pLin,type="l",lwd=1, ylim=c(-0.1,1.2), col="blue", xlab="Recipients", ylab="LPM")
+lines(mRec,pLog,type="l",lwd=1, col="green")
+legend(10,1.0,c("LPM","Logistic"), lwd=c(1,1), col=c("blue","green"))
+# Temp <- data.frame(mRec,pLin,pLog);write.csv(Temp, "Figure.csv")
+
+# Example 9.4
+myData <- myData <- read_excel("jaggia_ba_2025_ch09_data.xlsx", sheet = "Spam")
+Logistic_Model <- glm(Spam ~ Recipients + Hyperlinks + Characters, family = binomial, data = myData)
+cf <- coef(Logistic_Model); (exp(cf[-1])-1)*100
+mRec <- seq(20,21,by = 1); mHyp <- mean(myData$Hyperlinks); mCha <- mean(myData$Characters)
+pLog <- predict(Logistic_Model, data.frame(Recipients=mRec, Hyperlinks=mHyp, Characters=mCha), type = "response")
+oLog <- pLog/(1-pLog); ((oLog[2]/oLog[1])-1)*100
+
+# Example 9.5
+myData <- myData <- read_excel("jaggia_ba_2025_ch09_data.xlsx", sheet = "Spam")
+Linear_Model <- lm(Spam ~ Recipients + Hyperlinks + Characters, data = myData)
+Logistic_Model <- glm(Spam ~ Recipients + Hyperlinks + Characters, family = binomial, data = myData)
+pHatLin <- predict(Linear_Model)
+pHatLog <- predict(Logistic_Model, type = "response")
+yHatLin <- ifelse(pHatLin >= 0.5, 1,0)
+yHatLog <- ifelse(pHatLog >= 0.5, 1,0)
+100*mean(myData$Spam == yHatLin)
+100*mean(myData$Spam == yHatLog)
+
+# Example 9.6
+myData <- myData <- read_excel("jaggia_ba_2025_ch09_data.xlsx", sheet = "Spam")
+TData <- myData[1:375,]; VData <- myData[376:500,]
+Model1 <- glm(Spam ~ Recipients + Hyperlinks + Characters, family = binomial, data = TData)
+pHat1 <- predict(Model1, VData, type = "response")
+yHat1 <- ifelse(pHat1 >= 0.5, 1,0)
+100*mean(VData$Spam == yHat1)
+Model2 <- glm(Spam ~ Recipients + Hyperlinks, family = binomial, data = TData)
+pHat2 <- predict(Model2, VData, type = "response")
+yHat2 <- ifelse(pHat2 >= 0.5, 1,0)
+100*mean(VData$Spam == yHat2)
+Modelf <- glm(Spam ~ Recipients + Hyperlinks + Characters, family = binomial, data = myData)
+summary(Modelf)
+predict(Modelf, data.frame(Recipients=20, Hyperlinks=5, Characters=60), type="response")
+
+# Example 9.7
+myData <- myData <- read_excel("jaggia_ba_2025_ch09_data.xlsx", sheet = "Spam")
+TData <- myData[1:375,]; VData <- myData[376:500,]
+Model1 <- glm(Spam ~ Recipients + Hyperlinks + Characters, family = binomial, data = TData)
+Model2 <- glm(Spam ~ Recipients + Hyperlinks, family = binomial, data = TData)
+pHat1 <- predict(Model1, VData, type = "response")
+yHat1 <- ifelse(pHat1 >= 0.5, 1,0)
+pHat2 <- predict(Model2, VData, type = "response")
+yHat2 <- ifelse(pHat2 >= 0.5, 1,0)
+Acc1a <- 100*mean(VData$Spam == yHat1)
+Acc2a <- 100*mean(VData$Spam == yHat2)
+TData <- myData[c(1:250, 376:500),]; VData <- myData[251:375,]
+Model1 <- glm(Spam ~ Recipients + Hyperlinks + Characters, family = binomial, data = TData)
+Model2 <- glm(Spam ~ Recipients + Hyperlinks, family = binomial, data = TData)
+pHat1 <- predict(Model1, VData, type = "response")
+yHat1 <- ifelse(pHat1 >= 0.5, 1,0)
+pHat2 <- predict(Model2, VData, type = "response")
+yHat2 <- ifelse(pHat2 >= 0.5, 1,0)
+Acc1b <- 100*mean(VData$Spam == yHat1)
+Acc2b <- 100*mean(VData$Spam == yHat2)
+TData <- myData[c(1:125, 251:500),]; VData <- myData[126:250,]
+Model1 <- glm(Spam ~ Recipients + Hyperlinks + Characters, family = binomial, data = TData)
+Model2 <- glm(Spam ~ Recipients + Hyperlinks, family = binomial, data = TData)
+pHat1 <- predict(Model1, VData, type = "response")
+yHat1 <- ifelse(pHat1 >= 0.5, 1,0)
+pHat2 <- predict(Model2, VData, type = "response")
+yHat2 <- ifelse(pHat2 >= 0.5, 1,0)
+Acc1c <- 100*mean(VData$Spam == yHat1)
+Acc2c <- 100*mean(VData$Spam == yHat2)
+TData <- myData[126:500,]; VData <- myData[1:125,]
+Model1 <- glm(Spam ~ Recipients + Hyperlinks + Characters, family = binomial, data = TData)
+Model2 <- glm(Spam ~ Recipients + Hyperlinks, family = binomial, data = TData)
+pHat1 <- predict(Model1, VData, type = "response")
+yHat1 <- ifelse(pHat1 >= 0.5, 1,0)
+pHat2 <- predict(Model2, VData, type = "response")
+yHat2 <- ifelse(pHat2 >= 0.5, 1,0)
+Acc1d <- 100*mean(VData$Spam == yHat1)
+Acc2d <- 100*mean(VData$Spam == yHat2)
+c(Acc1a,Acc1b,Acc1c,Acc1d);(Acc1a+Acc1b+Acc1c+Acc1d)/4
+c(Acc2a,Acc2b,Acc2c,Acc2d);(Acc2a+Acc2b+Acc2c+Acc2d)/4
+
+# Example 9.8
+myData <- myData <- read_excel("jaggia_ba_2025_ch09_data.xlsx", sheet = "Spam")
+TData <- myData[1:375,]; VData <- myData[376:500,]
+Model1 <- glm(Spam ~ Recipients + Hyperlinks + Characters, family = binomial, data = TData)
+pHat1 <- predict(Model1, VData, type = "response")
+yHat1 <- ifelse(pHat1 >= 0.5, 1,0)
+yTP1 <- ifelse(yHat1 == 1 & VData$Spam == 1, 1, 0)
+yTN1 <- ifelse(yHat1 == 0 & VData$Spam == 0, 1, 0)
+100*mean(VData$Spam == yHat1)
+100*(sum(yTP1)/sum(VData$Spam==1))
+100*(sum(yTN1)/sum(VData$Spam==0))
+Model2 <- glm(Spam ~ Recipients + Hyperlinks, family = binomial, data = TData)
+pHat2 <- predict(Model2, VData, type = "response")
+yHat2 <- ifelse(pHat2 >= 0.5, 1,0)
+yTP2 <- ifelse(yHat2 == 1 & VData$Spam == 1, 1, 0)
+yTN2 <- ifelse(yHat2 == 0 & VData$Spam == 0, 1, 0)
+100*mean(VData$Spam == yHat2)
+100*(sum(yTP2)/sum(VData$Spam==1))
+100*(sum(yTN2)/sum(VData$Spam==0))
+
+# Example 9.9
+myData <- myData <- read_excel("jaggia_ba_2025_ch09_data.xlsx", sheet = "Depression")
+TData <- myData[1:225,]; VData <- myData[226:300,]
+Model <- glm(Depression~GPA+Attendance+Female,data=TData, family="binomial")
+pHat <- predict(Model, VData, type = "response")
+yHat1 <- ifelse(pHat >= 0.5, 1,0)
+yTP1 <- ifelse(yHat1 == 1 & VData$Depression == 1, 1, 0)
+yTN1 <- ifelse(yHat1 == 0 & VData$Depression == 0, 1, 0)
+100*mean(VData$Depression == yHat1)
+100*(sum(yTP1)/sum(VData$Depression==1))
+100*(sum(yTN1)/sum(VData$Depression==0))
+yHat2 <- ifelse(pHat >= mean(TData$Depression), 1,0)
+yTP2 <- ifelse(yHat2 == 1 & VData$Depression == 1, 1, 0)
+yTN2 <- ifelse(yHat2 == 0 & VData$Depression == 0, 1, 0)
+100*mean(VData$Depression == yHat2)
+100*(sum(yTP2)/sum(VData$Depression==1))
+100*(sum(yTN2)/sum(VData$Depression==0))
+
+# Writing with Data
+myData <- read_excel("jaggia_ba_2025_ch09_data.xlsx", sheet = "College_Admissions")
+Data <- myData[myData$College=="Arts & Letters",c(4:8,10,11)]
+Data$Male <- ifelse(Data$Gender == "M",1,0)
+Data$Other <- 1-Data$White - Data$Asian
+Data1 <- Data[Data$Admitted=="Yes",]
+Data2 <- Data1[Data1$Enrolled=="Yes",]
+colMeans(Data[,c(8,2,3,9,4,5)])
+colMeans(Data1[,c(8,2,3,9,4,5)])
+colMeans(Data2[,c(8,2,3,9,4,5)])
+dim(Data); dim(Data1); dim(Data2)
+Data$y1 <- ifelse(Data$Admitted == "Yes",1,0)
+Data1$y2 <- ifelse(Data1$Enrolled == "Yes",1,0)
+Model1 <- glm(y1~Male+White+Asian+HSGPA+SAT, family=binomial, data = Data)
+summary(Model1)
+pHat1 <- predict(Model1, type = "response")
+yHat1 <- ifelse(pHat1 >= 0.5, 1,0)
+100*mean(Data$y1 == yHat1)
+Model2 <- glm(y2~Male+White+Asian+HSGPA+SAT, family=binomial, data = Data1)
+summary(Model2)
+pHat2 <- predict(Model2, type = "response")
+yHat2 <- ifelse(pHat2 >= 0.5, 1,0)
+100*mean(Data1$y2 == yHat2)
+predict(Model1, data.frame(Male=1,White=1,Asian=0,HSGPA=3.8,SAT=1300), type = "response")
+predict(Model2, data.frame(Male=1,White=1,Asian=0,HSGPA=3.8,SAT=1300), type = "response")
+predict(Model1, data.frame(Male=1,White=0,Asian=1,HSGPA=3.8,SAT=1300), type = "response")
+predict(Model2, data.frame(Male=1,White=0,Asian=1,HSGPA=3.8,SAT=1300), type = "response")
+predict(Model1, data.frame(Male=1,White=0,Asian=0,HSGPA=3.8,SAT=1300), type = "response")
+predict(Model2, data.frame(Male=1,White=0,Asian=0,HSGPA=3.8,SAT=1300), type = "response")
+
+#Report 1
+myData <- read_excel("jaggia_ba_2025_ch09_data.xlsx", sheet = "COVID_Testing")
+Data <- myData[myData$`Age_60_And_Above`=="Yes",]
+Data <- Data[Data$Contact==0,]
+Data$Positive <- ifelse(Data$Result == "positive",1,0)
+Data$Female <- ifelse(Data$Sex == "female",1,0)
+Data <- na.omit(Data)
+dim(Data)
+Model <- glm(Positive ~ Cough + Fever + Sore_Throat + Shortness_Of_Breath + Headache + Female, family=binomial, data = Data)
+summary(Model)
+pHat <- predict(Model, type = "response")
+#Using 0.5 threshold
+yHat1 <- ifelse(pHat >= 0.5, 1,0)
+yTP1 <- ifelse(yHat1 == 1 & Data$Positive == 1, 1, 0)
+yTN1 <- ifelse(yHat1 == 0 & Data$Positive == 0, 1, 0)
+100*mean(Data$Positive == yHat1)
+100*(sum(yTP1)/sum(Data$Positive==1))
+100*(sum(yTN1)/sum(Data$Positive==0))
+#Using average threshold
+yHat2 <- ifelse(pHat >= mean(Data$Positive), 1,0)
+yTP2 <- ifelse(yHat2 == 1 & Data$Positive == 1, 1, 0)
+yTN2 <- ifelse(yHat2 == 0 & Data$Positive == 0, 1, 0)
+100*mean(Data$Positive == yHat2)
+100*(sum(yTP2)/sum(Data$Positive==1))
+100*(sum(yTN2)/sum(Data$Positive==0))
+
+#Report 2
+myData <- read_excel("jaggia_ba_2025_ch09_data.xlsx", sheet = "Longitudinal_Survey")
+Data <- na.omit(myData)
+dim(Data)
+Model1 <- lm(Outgoing_Adult ~ Age+Urban+Mother_Edu+Father_Edu+Siblings+White+Black+Hispanic+Christian+Male, data = Data)
+summary(Model1)
+pHat1 <- predict(Model1, type = "response")
+yHat1 <- ifelse(pHat1 >= 0.5, 1,0)
+100*mean(Data$Outgoing_Adult == yHat1)
+Model2 <- glm(Outgoing_Adult ~ Age+Urban+Mother_Edu+Father_Edu+Siblings+White+Black+Hispanic+Christian+Male, family=binomial, data = Data)
+summary(Model2)
+pHat2 <- predict(Model2, type = "response")
+yHat2 <- ifelse(pHat2 >= 0.5, 1,0)
+100*mean(Data$Outgoing_Adult == yHat2)
+
+#Report 3
+myData <- read_excel("jaggia_ba_2025_ch09_data.xlsx", sheet = "TechSales_Reps")
+Data <- myData[myData$Business=="Software",]
+Data$College <- ifelse(Data$College == "Yes",1,0)
+Data$Analyst <- ifelse(Data$Personality == "Analyst",1,0)
+Data$Diplomat <- ifelse(Data$Personality == "Diplomat",1,0)
+Data$Explorer <- ifelse(Data$Personality == "Explorer",1,0)
+Data$Sentinel <- ifelse(Data$Personality == "Sentinel",1,0)
+Data$BinNPS <- ifelse(Data$NPS >= 9,1,0)
+dim(Data)
+Model1 <- lm(BinNPS ~ Age + Female + College + Analyst + Diplomat + Explorer + Certificates, data = Data)
+summary(Model1)
+pHat1 <- predict(Model1)
+yHat1 <- ifelse(pHat1 >= 0.5, 1,0)
+yTP1 <- ifelse(yHat1 == 1 & Data$BinNPS == 1, 1, 0)
+yTN1 <- ifelse(yHat1 == 0 & Data$BinNPS == 0, 1, 0)
+100*mean(Data$BinNPS == yHat1)
+100*(sum(yTP1)/sum(Data$BinNPS==1))
+100*(sum(yTN1)/sum(Data$BinNPS==0))
+Model2 <- glm(BinNPS ~ Age + Female + College + Analyst + Diplomat + Explorer + Certificates, family=binomial, data = Data)
+summary(Model2)
+pHat2 <- predict(Model2, type = "response")
+yHat2 <- ifelse(pHat2 >= 0.5, 1,0)
+yTP2 <- ifelse(yHat2 == 1 & Data$BinNPS == 1, 1, 0)
+yTN2 <- ifelse(yHat2 == 0 & Data$BinNPS == 0, 1, 0)
+100*mean(Data$BinNPS == yHat2)
+100*(sum(yTP2)/sum(Data$BinNPS==1))
+100*(sum(yTN2)/sum(Data$BinNPS==0))
+
+#Report 4
+myData <- read_excel("jaggia_ba_2025_ch09_data.xlsx", sheet = "Car_Crash")
+Data <- myData[myData$County=="SAN DIEGO",]
+Data$HeadOn <- ifelse(Data$CrashType == "A",1,0)
+Data$Weekend <- ifelse(Data$Weekday >= 6,1,0)
+Data <- na.omit(Data)
+dim(Data)
+Model <- glm(HeadOn ~ ClearWeather+Highway+Daylight+Weekend, family=binomial, data = Data)
+summary(Model)
+pHat <- predict(Model, type = "response")
+#Using 0.5 threshold
+yHat1 <- ifelse(pHat >= 0.5, 1,0)
+yTP1 <- ifelse(yHat1 == 1 & Data$HeadOn == 1, 1, 0)
+yTN1 <- ifelse(yHat1 == 0 & Data$HeadOn == 0, 1, 0)
+100*mean(Data$HeadOn == yHat1)
+100*(sum(yTP1)/sum(Data$HeadOn==1))
+100*(sum(yTN1)/sum(Data$HeadOn==0))
+#Using average threshold
+yHat2 <- ifelse(pHat >= mean(Data$HeadOn), 1,0)
+yTP2 <- ifelse(yHat2 == 1 & Data$HeadOn == 1, 1, 0)
+yTN2 <- ifelse(yHat2 == 0 & Data$HeadOn == 0, 1, 0)
+100*mean(Data$HeadOn == yHat2)
+100*(sum(yTP2)/sum(Data$HeadOn==1))
+100*(sum(yTN2)/sum(Data$HeadOn==0))
+
+#Appendix
+myData <- read_excel("jaggia_ba_2025_ch09_data.xlsx", sheet = "Spam")
+library(caret)
+library(e1071)
+myControl <- trainControl(method = "cv", number = 4)
+myData$Spam <- as.factor(myData$Spam)
+Model1 <- train(Spam ~ Recipients + Hyperlinks + Characters, data = myData, trControl = myControl, method = "glm", family = binomial, metric = "Accuracy")
+Model1
+Model2 <- train(Spam ~ Recipients + Hyperlinks, data = myData, trControl = myControl, method = "glm", family = binomial, metric = "Accuracy")
+Model2

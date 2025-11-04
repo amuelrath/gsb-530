@@ -1,0 +1,283 @@
+---
+title: "Midterm Exam"
+format: 
+    html:
+        embed-resources: true
+execute:
+    echo: true
+---
+
+## Question 24
+
+```{r}
+myMatrix <- matrix(
+    data = c(2, 2, 5, 5, 12, 1),
+    nrow = 3,
+    ncol = 2,
+    byrow = TRUE
+) 
+myMatrix
+```
+
+Using the Euclidean distance between pairwise observations, which pairwise observation is most dissimilar?
+
+```{r}
+euclids <- dist(myMatrix, method = "euclidean")
+euclids
+```
+
+## Question 25
+
+Sandra began collecting transaction details to see if the same items were in each sales transaction. Compute the **matching coefficient** and **Jaccard’s coefficient** for pairwise transaction 1 & 2.
+
+```{r}
+matching_coef <- function(row1, row2) {
+    matches <- sum(row1 == row2)
+    total <- length(row1)
+    return(matches / total)
+}
+```
+
+```{r}
+jaccard_similarity <- function(A, B) {
+  intersection = length(intersect(A, B))
+  union = length(A) + length(B) - intersection
+  return (intersection/union)
+}
+```
+
+```{r}
+Coffee <- c(0, 0)
+Tea <- c(0, 0)
+Scone <- c(1, 0)
+Muffin <- c(1, 1)
+Cookie <- c(1, 0)
+
+myData <- data.frame(
+    Coffee = Coffee,
+    Tea = Tea,
+    Scone = Scone,
+    Muffin = Muffin,
+    Cookie = Cookie
+)
+View(myData)
+```
+
+```{r}
+matching_coef(myData[1,], myData[2,])
+```
+
+```{r}
+jaccard(myData[1,], myData[2,])
+```
+
+```{r}
+jaccards_similarity <- dist(myData, method = "binary")
+1 - jaccards_similarity
+```
+
+## Question 28
+
+```{r}
+TN <- 56
+FP <- 12
+specificity <- (TN) / (TN + FP)
+specificity
+```
+
+## Question 30
+
+Calculate the misclassification rate for the following confusion matrix
+
+```{r}
+TP <- 19
+FP <- 11
+TN <- 59
+FN <- 11
+accuracy <- (TP + TN) / (TP + TN + FP + FN)
+misclassification_rate <- 1 - accuracy
+misclassification_rate
+```
+
+## Question 31
+
+```{r}
+library(readxl)
+myData <- read_excel("data/Ch2_Q45_Data_File.xlsx")
+View(myData)
+```
+
+Greg wants to calculate the number of days between January 1, 2022, and the last transaction date. Create a new variable “DaysSinceLast” that contains the number of days since the last transaction. 
+
+What is the average number of days since the last purchase for all the customers?
+
+```{r}
+ref_date <- as.Date("2022-01-01")
+myData$DaysSinceLast <- as.numeric(ref_date - as.Date(myData$LastTransactionDate) )
+
+mean(myData$DaysSinceLast)
+```
+
+
+```{r}
+# Recency
+myData$R_Score <- cut((myData$DaysSinceLast),
+                            breaks = quantile(myData$DaysSinceLast, probs = seq(0, 1, 0.2)),
+                            labels = 1:5,
+                            include.lowest = TRUE
+)
+myData$R_Score <- 6 - as.numeric(myData$R_Score)
+
+# Frequency
+myData$F_Score <- as.numeric(cut(myData$Frequency,
+                              breaks = quantile(myData$Frequency, probs = seq(0, 1, 0.2)),
+                              labels = 1:5,
+                              include.lowest = TRUE))
+
+myData$M_Score <- as.numeric(cut(myData$TotalSpending,
+                              breaks = quantile(myData$TotalSpending, probs = seq(0, 1, 0.2)),
+                              labels = 1:5,
+                              include.lowest = TRUE))
+
+myData$RFM_Score <- paste0(myData$R_Score, myData$F_Score, myData$M_Score)
+```
+
+```{r}
+customers_555 <- myData[myData$RFM_Score == "555", ]
+
+num_customers_555 <- nrow(customers_555)
+avg_spending_555 <- mean(customers_555$TotalSpending)
+c(num_customers_555, avg_spending_555)
+```
+
+Create a new variable called “LogSpending” that contains the natural logarithms for the total spending during the past 2 years. Bin the logarithm values into 5 equal-interval groups. Label the groups using numbers 1 (lowest values) to 5 (highest values). How many observations are in group 2?
+
+```{r}
+myData$LogSpending <- log(myData$TotalSpending)
+
+grouped <- cut(myData$LogSpending,
+               breaks = 5,
+               labels = 1:5,
+               include.lowest = TRUE,
+)
+
+sum(grouped == 2)
+```
+
+Create a new variable called “AverageOrderSize” that contains the average spending per order. This is calculated by dividing total spending (Spending) by total number of transactions (Frequency) in the past 2 years. Bin the values of AverageOrderSize into 5 equal-interval groups. Label the groups using numbers 1 (lowest values) to 5 (highest values). How many observations are in group 2?
+
+```{r}
+myData$AverageOrderSize <- myData$TotalSpending / myData$Frequency
+
+grouped <- cut(myData$AverageOrderSize,
+               breaks = 5,
+               labels = 1:5,
+               include.lowest = TRUE,
+)
+
+sum(grouped == 2)
+```
+
+## Question 32
+
+```{r}
+myData <- read_excel("data/Ch7_Q17_Data_File.xlsx")
+View(myData)
+```
+
+```{r}
+model <- lm(Salary ~ PC + TD + Age, data = myData)
+summary(model)
+```
+
+Player 8 earned 12.9895 million dollars during the season. According to the model, what is his predicted salary if PC = 70.6, TD = 34, and Age = 30?
+
+```{r}
+item <- data.frame(PC = 70.6, TD = 34, Age = 30)
+predict(model, item)
+```
+
+Player 16 earned 8.0073 million dollars during the season. According to the model, what is his predicted salary if PC = 65.7, TD = 28, and Age = 32?
+
+```{r}
+item <- data.frame(PC = 65.7, TD = 28, Age = 32)
+predict(model, item)
+```
+
+Compute the residual salary for Player 8 and Player 16.
+
+```{r}
+player_8 <- data.frame(PC = 70.6, TD = 34, Age = 30)
+pred_player_8 <- predict(model, player_8)
+resid_8 <- pred_player_8 - 12.9895
+resid_8
+```
+
+```{r}
+player_16 <-  data.frame(PC = 65.7, TD = 28, Age = 32)
+pred_player_16 <- predict(model, player_16)
+resid_16 <- pred_player_16 - 8.0073
+resid_16
+```
+
+## Question 33
+
+Compute the misclassification rate, accuracy rate, sensitivity, precision, and specificity of the classification model.
+
+```{r}
+TP <- 130
+FP <- 2402
+TN <- 27298
+FN <- 170
+```
+
+```{r}
+accuracy <- (TP + TN) / (TP + TN + FP + FN)
+print(paste("Accuracy:", accuracy))
+
+misclassification_rate <- 1 - accuracy
+print(paste("Misclassification Rate: ", misclassification_rate))
+
+sensitivity <- (TP) / (TN + FN)
+print(paste("Sensitivity: ", sensitivity))
+
+precision <- (TP) / (TP + FP)
+print(paste("Precision: ", precision))
+
+specificity <- (TN) / (TN + FP)
+print(paste("Specificity: ", specificity))
+```
+
+## Question 34
+
+```{r}
+myData <- read_excel("data/Ch9_Q25_v15_Data_File.xlsx")
+View(myData)
+```
+
+Estimate the logistic regression model to predict the odds of acceptability for a very religious 50-year-old adult.
+
+```{r}
+model <- glm(Acceptable ~ Age + Religious, data = myData, family = binomial(link = "logit"))
+summary(model)
+```
+
+```{r}
+item <- data.frame(Age = 50, Religious = 1)
+predict(model, item, type = "response")
+
+odds <- 0.58875 / (1 - 0.58876)
+odds
+```
+
+What is the percentage difference in the acceptability for a very religious adult compared to a nonreligious adult, holding age constant?
+
+```{r}
+religious <- data.frame(Age = 50, Religious = 1)
+non_religious <- data.frame(Age = 50, Religious = 0)
+
+pred_religious <- predict(model, religious, type = "response")
+pred_non_religious <- predict(model, non_religious, type = "response")
+
+c(pred_religious, pred_non_religious)
+```
